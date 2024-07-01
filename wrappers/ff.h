@@ -2,6 +2,7 @@
 #define __FF_H__
 
 #include <stdbool.h>
+#include "include/index.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,8 +61,14 @@ extern "C" {
 	If we want the index to be loaded the whole time, would need to implement a load function, return the index, and then pass it in to each of the functions above. 
 	*/
 
+	void* wrappedLoadIndex(char* index_filename);
+	
+
 #ifdef __cplusplus
 }
 #endif
+
+template <typename FulgorIndex>
+void* loadIndex(char* index_filename);
 
 #endif /* __FF_H__ */
