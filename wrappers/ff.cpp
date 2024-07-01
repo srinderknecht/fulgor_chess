@@ -19,19 +19,20 @@
 using namespace std;
 using namespace fulgor;
 
+// // Wrapper struct to hold the index
+// template <typename FulgorIndex>
+// void* loadIndex(char* index_filename){
+//     FulgorIndex* index = new FulgorIndex();  // Use 'new' instead of malloc
+//     essentials::load(*index, index_filename);
+//     cout << "Complete" << endl;
+//     return index;
+// }
 
-// Wrapper struct to hold the index
-
-template <typename FulgorIndex>
-void* loadIndex(char* index_filename){
-    FulgorIndex* index = new FulgorIndex();  // Use 'new' instead of malloc
+void* wrappedLoadIndex(char* index_filename) {
+    index_type* index = new index_type();  // Use 'new' instead of malloc
     essentials::load(*index, index_filename);
     cout << "Complete" << endl;
     return index;
-}
-
-void* wrappedLoadIndex(char* index_filename) {
-    return loadIndex<index_type>(const_cast<char*>(index_filename));
 }
 
 int* query(int* ret_arr, char* query_file, char* index_file, double threshold, 
@@ -45,7 +46,9 @@ int* query(int* ret_arr, char* query_file, char* index_file, double threshold,
     return ret_arr;
 }
 
-void index_stats(int argc, char** argv) {
-	stats(argc, argv);
+void index_stats(void* indexPtr) {
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type f = (*f_ptr);
+    f.print_stats();
 }
 

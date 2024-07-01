@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+
+
 	// import fulgor library/functions somehow
 
 	/*
@@ -39,7 +41,7 @@ extern "C" {
 			Writes to std::out
 				fulgor stats
 	*/
-	void index_stats(int argc, char ** argv);
+	void index_stats(void* indexPtr);
 
 	/*
 	If we want the client to be able to specify parameters for the building of fulgor index? 
@@ -62,13 +64,15 @@ extern "C" {
 	*/
 
 	void* wrappedLoadIndex(char* index_filename);
+
+	void wrappedTest(void* indexPtr);
 	
 
 #ifdef __cplusplus
 }
 #endif
 
-template <typename FulgorIndex>
-void* loadIndex(char* index_filename);
+// template <typename FulgorIndex>
+// void* loadIndex(char* index_filename);
 
 #endif /* __FF_H__ */
