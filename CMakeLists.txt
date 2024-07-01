@@ -85,9 +85,28 @@ add_library(sshash_static STATIC
   ${SSHASH_SOURCES}
 )
 
+add_library(wrapper SHARED
+  wrappers/ff.cpp
+  ${Z_LIB_SOURCES}
+  ${SSHASH_SOURCES}
+  ${ggcat_cpp_api}
+)
+
+target_link_libraries(wrapper 
+  z
+  ${GGCAT}
+  ${GGCAT_API}
+  ${GGCAT_CPP_BINDINGS}
+  ${GGCAT_CXX_INTEROP}
+  ${CMAKE_DL_LIBS}
+)
+
+
+#add_executable(fulgor tools/test.c tools/ff.cpp)
 add_executable(fulgor tools/fulgor.cpp)
 add_dependencies(fulgor ggcat_cpp_api sshash_static)
 target_link_libraries(fulgor
+  wrapper
   sshash_static
   z
   ${GGCAT}

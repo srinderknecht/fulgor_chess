@@ -44,8 +44,8 @@ template <typename FulgorIndex>
 int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::ReadSeq>& rparser,
            std::atomic<uint64_t>& num_reads, std::atomic<uint64_t>& num_mapped_reads,
            pseudoalignment_algorithm algo, const double threshold, std::ofstream& out_file,
-           std::mutex& iomut, std::mutex& ofile_mut) {
-    std::vector<uint32_t> colors;  // result of pseudo-alignment
+           std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& colors) {
+    //std::vector<uint32_t> colors;  // result of pseudo-alignment
     std::stringstream ss;
     uint64_t buff_size = 0;
     constexpr uint64_t buff_thresh = 50;
@@ -119,7 +119,9 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                     std::string outs = ss.str();
                     ss.str("");
                     ofile_mut.lock();
-                    out_file.write(outs.data(), outs.size());
+                    // SOPHIE CHANGE added this line
+                    std::cout << outs.data() << std::endl;
+                    //out_file.write(outs.data(), outs.size());
                     ofile_mut.unlock();
                     buff_size = 0;
                 }
@@ -159,7 +161,9 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                     std::string outs = ss.str();
                     ss.str("");
                     ofile_mut.lock();
-                    out_file.write(outs.data(), outs.size());
+                    // SOPHIE CHANGE added this line
+                    std::cout << outs.data() << std::endl;
+                    //out_file.write(outs.data(), outs.size());
                     ofile_mut.unlock();
                     buff_size = 0;
                 }
@@ -172,7 +176,9 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
         std::string outs = ss.str();
         ss.str("");
         ofile_mut.lock();
-        out_file.write(outs.data(), outs.size());
+        // SOPHIE CHANGE added this line
+        std::cout << outs.data() << std::endl;
+        //out_file.write(outs.data(), outs.size());
         ofile_mut.unlock();
         buff_size = 0;
     }
@@ -183,7 +189,7 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
 template <typename FulgorIndex>
 int pseudoalign(std::string const& index_filename, std::string const& query_filename,
                 std::string const& output_filename, uint64_t num_threads, double threshold,
-                pseudoalignment_algorithm algo) {
+                pseudoalignment_algorithm algo, std::vector<uint32_t>& colors) {
     FulgorIndex index;
     essentials::logger("loading index from disk...");
     essentials::load(index, index_filename.c_str());
@@ -240,9 +246,9 @@ int pseudoalign(std::string const& index_filename, std::string const& query_file
 
     for (uint64_t i = 1; i != num_threads; ++i) {
         workers.push_back(std::thread([&index, &rparser, &num_reads, &num_mapped_reads, algo,
-                                       threshold, &out_file, &iomut, &ofile_mut]() {
+                                       threshold, &out_file, &iomut, &ofile_mut, &colors]() {
             do_map(index, rparser, num_reads, num_mapped_reads, algo, threshold, out_file, iomut,
-                   ofile_mut);
+                   ofile_mut, colors);
         }));
     }
 
@@ -267,6 +273,7 @@ int pseudoalign(int argc, char** argv) {
     std::string index_filename;
     std::string query_filename;
     std::string output_filename;
+    std::vector<uint32_t> colors;
     uint64_t num_threads = 1;
     double threshold = constants::invalid_threshold;
     pseudoalignment_algorithm algo = pseudoalignment_algorithm::FULL_INTERSECTION;
@@ -298,10 +305,10 @@ int pseudoalign(int argc, char** argv) {
     if (sshash::util::ends_with(index_filename,
                                 constants::meta_colored_fulgor_filename_extension)) {
         return pseudoalign<meta_index_type>(index_filename, query_filename, output_filename,
-                                            num_threads, threshold, algo);
+                                            num_threads, threshold, algo, colors);
     } else if (sshash::util::ends_with(index_filename, constants::fulgor_filename_extension)) {
         return pseudoalign<index_type>(index_filename, query_filename, output_filename, num_threads,
-                                       threshold, algo);
+                                       threshold, algo, colors);
     }
 
     std::cerr << "Wrong filename supplied." << std::endl;
