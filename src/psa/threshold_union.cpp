@@ -14,8 +14,8 @@ struct scored {
 typedef scored<uint64_t> scored_id;
 
 template <typename Iterator>
-void merge(std::vector<Iterator>& iterators, std::vector<uint32_t>& colors,
-           const uint64_t min_score) {
+void merge(std::vector<Iterator>& iterators, std::vector<uint32_t>& colors, 
+            std::vector<uint32_t>& all_col, const uint64_t min_score) {
     if (iterators.empty()) return;
 
     uint32_t candidate =
@@ -37,7 +37,15 @@ void merge(std::vector<Iterator>& iterators, std::vector<uint32_t>& colors,
                 next_candidate = iterators[i].item.value();
             }
         }
-        if (score >= min_score) colors.push_back(candidate);
+        // SOPHIE CHANGE
+        // before::
+        //      if (score >= min_score) colors.push_back(candidate);
+        if (score >= min_score) {
+            colors.push_back(candidate);
+            all_col.push_back(candidate);
+            all_col.push_back(score);
+        }
+
         assert(next_candidate > candidate);
         candidate = next_candidate;
     }
@@ -70,6 +78,7 @@ uint64_t stream_through_with_multiplicities(sshash::dictionary const& k2u,
 template <typename ColorClasses>
 void index<ColorClasses>::pseudoalign_threshold_union(std::string const& sequence,
                                                       std::vector<uint32_t>& colors,
+                                                      std::vector<uint32_t>& all_col,
                                                       const double threshold) const {
     if (sequence.length() < m_k2u.k()) return;
     colors.clear();
@@ -125,7 +134,8 @@ void index<ColorClasses>::pseudoalign_threshold_union(std::string const& sequenc
     // uint64_t num_kmers_in_sequence = sequence.length() - m_k2u.k() + 1;
     // uint64_t min_score = static_cast<double>(num_kmers_in_sequence) * threshold;
 
-    merge(iterators, colors, min_score);
+    // SOPHIE CHANGE
+    merge(iterators, colors, all_col, min_score);
 }
 
 }  // namespace fulgor

@@ -30,20 +30,19 @@ void* loadIndex(char* index_filename){
     return index;
 }
 
-
 void* wrappedLoadIndex(char* index_filename) {
     return loadIndex<index_type>(const_cast<char*>(index_filename));
 }
-int* query(int** ret_arr, char* query_file, char* index_file, double threshold, 
+
+int* query(int* ret_arr, char* query_file, char* index_file, double threshold, 
                 bool strict_threshold) {
     std::vector<uint32_t> colors;
     pseudoalign<index_type>(std::string(index_file), std::string(query_file),
-                std::string("/nfshomes/srinder/output.txt"), 1, threshold, pseudoalignment_algorithm::FULL_INTERSECTION, colors);
-    *ret_arr = (int*) (malloc(sizeof(int) * 20));
+                std::string("/nfshomes/srober22/fulgor/out.txt"), 1, threshold, pseudoalignment_algorithm::FULL_INTERSECTION, colors);
     for(size_t i = 0; i < colors.size(); i++) {
-        *ret_arr[i] = colors[i];
+        ret_arr[i] = colors[i];
     }
-    return *ret_arr;
+    return ret_arr;
 }
 
 void index_stats(int argc, char** argv) {

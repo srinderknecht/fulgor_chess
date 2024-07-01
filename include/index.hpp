@@ -24,8 +24,8 @@ struct index {
 
     void pseudoalign_full_intersection(std::string const& sequence,
                                        std::vector<uint32_t>& results) const;
-    void pseudoalign_threshold_union(std::string const& sequence, std::vector<uint32_t>& results,
-                                     const double threshold) const;
+    void pseudoalign_threshold_union(std::string const& sequence, std::vector<uint32_t>& results, 
+                                     std::vector<uint32_t>& all_col, const double threshold) const;
 
     void intersect_unitigs(std::vector<uint64_t>& unitig_ids, std::vector<uint32_t>& colors) const;
 

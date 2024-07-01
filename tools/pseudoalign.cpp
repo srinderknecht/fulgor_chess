@@ -44,8 +44,8 @@ template <typename FulgorIndex>
 int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::ReadSeq>& rparser,
            std::atomic<uint64_t>& num_reads, std::atomic<uint64_t>& num_mapped_reads,
            pseudoalignment_algorithm algo, const double threshold, std::ofstream& out_file,
-           std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& colors) {
-    //std::vector<uint32_t> colors;  // result of pseudo-alignment
+           std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
+    std::vector<uint32_t> colors;  // result of pseudo-alignment
     std::stringstream ss;
     uint64_t buff_size = 0;
     constexpr uint64_t buff_thresh = 50;
@@ -106,6 +106,7 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                 } else {
                     ss << record.name << "\t0\n";
                 }
+                //all_col.insert(std::end(all_col), std::begin(colors), std::end(colors));
                 colors.clear();
                 unitig_ids.clear();
 
@@ -120,8 +121,8 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                     ss.str("");
                     ofile_mut.lock();
                     // SOPHIE CHANGE added this line
-                    std::cout << outs.data() << std::endl;
-                    //out_file.write(outs.data(), outs.size());
+                    //std::cout << outs.data() << std::endl;
+                    out_file.write(outs.data(), outs.size());
                     ofile_mut.unlock();
                     buff_size = 0;
                 }
@@ -136,7 +137,7 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                         index.pseudoalign_full_intersection(record.seq, colors);
                         break;
                     case pseudoalignment_algorithm::THRESHOLD_UNION:
-                        index.pseudoalign_threshold_union(record.seq, colors, threshold);
+                        index.pseudoalign_threshold_union(record.seq, colors, all_col, threshold);
                         break;
                     default:
                         break;
@@ -151,6 +152,7 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                     ss << record.name << "\t0\n";
                 }
                 num_reads += 1;
+                //all_col.insert(std::end(all_col), std::begin(colors), std::end(colors));
                 colors.clear();
                 if (num_reads > 0 and num_reads % 1000000 == 0) {
                     iomut.lock();
@@ -162,8 +164,8 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
                     ss.str("");
                     ofile_mut.lock();
                     // SOPHIE CHANGE added this line
-                    std::cout << outs.data() << std::endl;
-                    //out_file.write(outs.data(), outs.size());
+                    //std::cout << outs.data() << std::endl;
+                    out_file.write(outs.data(), outs.size());
                     ofile_mut.unlock();
                     buff_size = 0;
                 }
@@ -177,8 +179,8 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
         ss.str("");
         ofile_mut.lock();
         // SOPHIE CHANGE added this line
-        std::cout << outs.data() << std::endl;
-        //out_file.write(outs.data(), outs.size());
+        //std::cout << outs.data() << std::endl;
+        out_file.write(outs.data(), outs.size());
         ofile_mut.unlock();
         buff_size = 0;
     }
@@ -189,7 +191,7 @@ int do_map(FulgorIndex const& index, fastx_parser::FastxParser<fastx_parser::Rea
 template <typename FulgorIndex>
 int pseudoalign(std::string const& index_filename, std::string const& query_filename,
                 std::string const& output_filename, uint64_t num_threads, double threshold,
-                pseudoalignment_algorithm algo, std::vector<uint32_t>& colors) {
+                pseudoalignment_algorithm algo, std::vector<uint32_t>& all_col) {
     FulgorIndex index;
     essentials::logger("loading index from disk...");
     essentials::load(index, index_filename.c_str());
@@ -246,9 +248,9 @@ int pseudoalign(std::string const& index_filename, std::string const& query_file
 
     for (uint64_t i = 1; i != num_threads; ++i) {
         workers.push_back(std::thread([&index, &rparser, &num_reads, &num_mapped_reads, algo,
-                                       threshold, &out_file, &iomut, &ofile_mut, &colors]() {
+                                       threshold, &out_file, &iomut, &ofile_mut, &all_col]() {
             do_map(index, rparser, num_reads, num_mapped_reads, algo, threshold, out_file, iomut,
-                   ofile_mut, colors);
+                   ofile_mut, all_col);
         }));
     }
 
