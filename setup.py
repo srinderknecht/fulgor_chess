@@ -22,10 +22,10 @@ lib = CDLL('/nfshomes/srober22/fulgor_chess/build/libwrapper.so')  # Adjust the 
 # #     print(j)
 # print(list(x))
 
-lib.wrappedLoadIndex.restype = c_void_p
-lib.wrappedLoadIndex.argtypes = [c_char_p]
+lib.load_index.restype = c_void_p
+lib.load_index.argtypes = [c_char_p]
 
-index_ptr = lib.wrappedLoadIndex(b'/nfshomes/srober22/chess_fulgor_test.fur')
+index_ptr = lib.load_index(b'/nfshomes/srober22/chess_fulgor_test.fur')
 print(index_ptr)
 
 lib.index_stats.argtype = c_void_p

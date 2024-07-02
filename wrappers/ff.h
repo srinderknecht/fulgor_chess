@@ -7,9 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-
 	// import fulgor library/functions somehow
 
 	/*
@@ -63,9 +60,7 @@ extern "C" {
 	If we want the index to be loaded the whole time, would need to implement a load function, return the index, and then pass it in to each of the functions above. 
 	*/
 
-	void* wrappedLoadIndex(char* index_filename);
-
-	void wrappedTest(void* indexPtr);
+	void* load_index(char* index_filename);
 	
 
 #ifdef __cplusplus

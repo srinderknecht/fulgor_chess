@@ -20,6 +20,7 @@ using namespace std;
 using namespace fulgor;
 
 // // Wrapper struct to hold the index
+
 // template <typename FulgorIndex>
 // void* loadIndex(char* index_filename){
 //     FulgorIndex* index = new FulgorIndex();  // Use 'new' instead of malloc
@@ -28,7 +29,12 @@ using namespace fulgor;
 //     return index;
 // }
 
-void* wrappedLoadIndex(char* index_filename) {
+
+// void* wrappedLoadIndex(char* index_filename) {
+//     return loadIndex<index_type>(const_cast<char*>(index_filename));
+// }
+
+void* load_index(char* index_filename) {
     index_type* index = new index_type();  // Use 'new' instead of malloc
     essentials::load(*index, index_filename);
     cout << "Complete" << endl;
@@ -52,3 +58,14 @@ void index_stats(void* indexPtr) {
     f.print_stats();
 }
 
+// template <typename FulgorIndex>
+// void index_stats(void* indexPtr){
+//     FulgorIndex* f_ptr = (FulgorIndex*) indexPtr;
+//     FulgorIndex f = (*f_ptr);
+//     f.print_stats();
+// }
+
+
+// void wrapped_index_stats(void* indexPtr) {
+//     index_stats<index_type>(indexPtr);
+// }
