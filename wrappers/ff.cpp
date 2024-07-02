@@ -41,7 +41,7 @@ void* load_index(char* index_filename) {
     return index;
 }
 
-int query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
+int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
                 uint64_t num_threads, bool strict_threshold) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
@@ -67,7 +67,7 @@ int query(void* indexPtr, int* ret_arr, char* query_file, double threshold,
 
     std::ofstream out_file;
     //HARD CODED HERE
-    std::string output_filename = "/nfshomes/srinder/output.txt";
+    std::string output_filename = "/nfshomes/srober22/output.txt";
     //HARD CODED 
     out_file.open(output_filename, std::ios::out | std::ios::trunc);
     if (!out_file) {
@@ -109,3 +109,6 @@ void index_stats(void* indexPtr) {
 // void wrapped_index_stats(void* indexPtr) {
 //     index_stats<index_type>(indexPtr);
 // }
+
+
+

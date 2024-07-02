@@ -26,7 +26,10 @@ extern "C" {
 			array of bits [num subsets], arr[i] is 1 if subset i contains num k-mers over the given threshold, 0 otherwise
 				could also do it as an array of length [num subsets over the threshold], but would then need to store the integer of which subset it is 
 	*/
-	int query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
+	int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
+					uint64_t num_threads, bool strict_threshold);
+
+	int point_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
 					uint64_t num_threads, bool strict_threshold);
 
 	/*	
