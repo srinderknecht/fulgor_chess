@@ -7,6 +7,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	typedef struct SubsetCounts {
+        int s1;
+		int s2;
+		int s3;
+		int s4;
+		int s5;
+		int s6;
+		int s7;
+		int s8;
+		int s9;
+		int s10;
+	} SubsetCounts;
 	// import fulgor library/functions somehow
 
 	/*

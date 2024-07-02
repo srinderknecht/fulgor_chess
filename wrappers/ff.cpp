@@ -87,7 +87,11 @@ int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold
     rparser.stop();
 
     for(size_t i = 0; i < all_col.size(); i++) {
-        ret_arr[i] = all_col[i];
+        if (i % 2 == 0) {
+            // do this better...
+            int var = all_col[i];
+            ret_arr[var] = all_col[i + 1];
+        }
     }
     return 0;
 }
