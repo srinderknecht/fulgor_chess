@@ -70,9 +70,8 @@ int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold
     std::mutex ofile_mut;
 
     std::ofstream out_file;
-    //HARD CODED HERE
-    std::string output_filename = "/nfshomes/srober22/output.txt";
-    //HARD CODED 
+    std::string output_filename = "/dev/null";
+
     out_file.open(output_filename, std::ios::out | std::ios::trunc);
     if (!out_file) {
         essentials::logger("could not open output file " + output_filename);
@@ -100,11 +99,54 @@ int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold
     return 0;
 }
 
+int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
+					uint64_t num_threads, bool strict_threshold) {
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type index = (*f_ptr);
+
+    std::vector<uint32_t> all_col;
+
+    
+    pseudoalignment_algorithm algo = pseudoalignment_algorithm::THRESHOLD_UNION;
+    std::atomic<uint64_t> num_mapped_reads{0};
+    std::atomic<uint64_t> num_reads{0};
+    //auto query_filenames = std::vector<std::string>({query_file});
+    if (num_threads == 1) {
+        num_threads += 1;
+        essentials::logger(
+            "1 thread was specified, but an additional thread will be allocated for parsing");
+    }
+    //fastx_parser::FastxParser<fastx_parser::ReadSeq> rparser(query_filenames, num_threads, num_threads - 1);
+    //rparser.start();
+    std::vector<std::thread> workers;
+    std::mutex iomut;
+    std::mutex ofile_mut;
+
+    std::ofstream out_file;
+    //HARD CODED HERE
+    std::string output_filename = "/nfshomes/srinder/output.txt";
+    //HARD CODED 
+    out_file.open(output_filename, std::ios::out | std::ios::trunc);
+    if (!out_file) {
+        essentials::logger("could not open output file " + output_filename);
+        return 1;
+    }
+
+    chess_map(indexPtr, query_string, threshold, out_file, iomut, ofile_mut, all_col);
+
+    for (size_t i = 0; i < all_col.size(); i++) {
+        ret_arr[i] = all_col[i];
+    }
+
+    return 0;
+}
+
 void index_stats(void* indexPtr) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type f = (*f_ptr);
     f.print_stats();
 }
+
 /*
 int chess_map(void* indexPtr, char& query_string,
            std::atomic<uint64_t>& num_reads, std::atomic<uint64_t>& num_mapped_reads,
@@ -150,6 +192,7 @@ int chess_map(void* indexPtr, char& query_string,
     return 0;
 }
 */
+
 int chess_map(void* indexPtr, const char* query_sequence,
            const double threshold, std::ofstream& out_file, std::mutex& iomut,
            std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
@@ -205,48 +248,6 @@ int chess_map(void* indexPtr, const char* query_sequence,
 
     return 0;
 }
-int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
-					uint64_t num_threads, bool strict_threshold) {
-    index_type* f_ptr = (index_type*) indexPtr;
-    index_type index = (*f_ptr);
-
-    std::vector<uint32_t> all_col;
-
-    
-    pseudoalignment_algorithm algo = pseudoalignment_algorithm::THRESHOLD_UNION;
-    std::atomic<uint64_t> num_mapped_reads{0};
-    std::atomic<uint64_t> num_reads{0};
-    //auto query_filenames = std::vector<std::string>({query_file});
-    if (num_threads == 1) {
-        num_threads += 1;
-        essentials::logger(
-            "1 thread was specified, but an additional thread will be allocated for parsing");
-    }
-    //fastx_parser::FastxParser<fastx_parser::ReadSeq> rparser(query_filenames, num_threads, num_threads - 1);
-    //rparser.start();
-    std::vector<std::thread> workers;
-    std::mutex iomut;
-    std::mutex ofile_mut;
-
-    std::ofstream out_file;
-    //HARD CODED HERE
-    std::string output_filename = "/nfshomes/srinder/output.txt";
-    //HARD CODED 
-    out_file.open(output_filename, std::ios::out | std::ios::trunc);
-    if (!out_file) {
-        essentials::logger("could not open output file " + output_filename);
-        return 1;
-    }
-
-    chess_map(indexPtr, query_string, threshold, out_file, iomut, ofile_mut, all_col);
-
-    for (size_t i = 0; i < all_col.size(); i++) {
-        ret_arr[i] = all_col[i];
-    }
-
-    return 0;
-}
-
 
 
 // template <typename FulgorIndex>
