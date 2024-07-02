@@ -27,7 +27,7 @@ extern "C" {
 				could also do it as an array of length [num subsets over the threshold], but would then need to store the integer of which subset it is 
 	*/
 	int query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
-					int num_threads, bool strict_threshold);
+					uint64_t num_threads, bool strict_threshold);
 
 	/*	
 	Dumps the statistics of the current fulgor index to std::out

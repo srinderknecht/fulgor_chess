@@ -66,7 +66,9 @@ int query(void* indexPtr, int* ret_arr, char* query_file, double threshold,
     std::mutex ofile_mut;
 
     std::ofstream out_file;
-    std::string output_filename = "/nfshomes/srober22/output.txt";
+    //HARD CODED HERE
+    std::string output_filename = "/nfshomes/srinder/output.txt";
+    //HARD CODED 
     out_file.open(output_filename, std::ios::out | std::ios::trunc);
     if (!out_file) {
         essentials::logger("could not open output file " + output_filename);
