@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "include/index.hpp"
+#include <mutex>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,10 @@ extern "C" {
 
 	int point_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
 					uint64_t num_threads, bool strict_threshold);
+
+	int chess_map(void* indexPtr, const char* query_sequence, 
+					const double threshold, std::ofstream& out_file, 
+					std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& all_col);
 
 	/*	
 	Dumps the statistics of the current fulgor index to std::out

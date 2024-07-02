@@ -15,6 +15,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <mutex>
+#include <sstream>
+//#include "src/psa/threshold_union.cpp"
+
 
 using namespace std;
 using namespace fulgor;
@@ -97,6 +101,149 @@ void index_stats(void* indexPtr) {
     index_type f = (*f_ptr);
     f.print_stats();
 }
+/*
+int chess_map(void* indexPtr, char& query_string,
+           std::atomic<uint64_t>& num_reads, std::atomic<uint64_t>& num_mapped_reads,
+           pseudoalignment_algorithm algo, const double threshold, std::ofstream& out_file,
+           std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
+    //Potentially replace indexPtr with FulgorIndex const& index
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type index = (*f_ptr);
+    std::vector<uint32_t> colors;  // result of pseudo-alignment
+    std::stringstream ss;
+    uint64_t buff_size = 0;
+    constexpr uint64_t buff_thresh = 50;
+
+    index.pseudoalign_threshold_union(query_string, colors, all_col, threshold);
+    buff_size += 1;
+                if (!colors.empty()) {
+                    num_mapped_reads += 1;
+                    ss << record.name << "\t" << colors.size();
+                    for (auto c : colors) { ss << "\t" << c; }
+                    ss << "\n";
+                } else {
+                    ss << record.name << "\t0\n";
+                }
+                num_reads += 1;
+                //all_col.insert(std::end(all_col), std::begin(colors), std::end(colors));
+                colors.clear();
+                if (num_reads > 0 and num_reads % 1000000 == 0) {
+                    iomut.lock();
+                    std::cout << "mapped " << num_reads << " reads" << std::endl;
+                    iomut.unlock();
+                }
+                if (buff_size > buff_thresh) {
+                    std::string outs = ss.str();
+                    ss.str("");
+                    ofile_mut.lock();
+                    // SOPHIE CHANGE added this line
+                    //std::cout << outs.data() << std::endl;
+                    out_file.write(outs.data(), outs.size());
+                    ofile_mut.unlock();
+                    buff_size = 0;
+                }
+
+    return 0;
+}
+*/
+int chess_map(void* indexPtr, const char* query_sequence,
+           const double threshold, std::ofstream& out_file, std::mutex& iomut,
+           std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
+    //Potentially replace indexPtr with FulgorIndex const& index
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type index = (*f_ptr);
+    std::vector<uint32_t> colors;
+    std::stringstream ss;
+    uint64_t buff_size = 0;
+    constexpr uint64_t buff_thresh = 50;
+    uint64_t num_reads = 0;
+    uint64_t num_mapped_reads = 0;
+
+    std::string query(query_sequence);
+    index.pseudoalign_threshold_union(query, colors, all_col, threshold);
+    buff_size += 1;
+    if (!colors.empty()) {
+        num_mapped_reads += 1;
+        ss << "query" << "\t" << colors.size();
+        for (auto c : colors) {
+            ss << "\t" << c;
+        }
+        ss << "\n";
+    } else {
+        ss << "query" << "\t0\n";
+    }
+
+    num_reads += 1;
+    colors.clear();
+
+    if (buff_size > buff_thresh) {
+        std::string outs = ss.str();
+        ss.str("");
+        ofile_mut.lock();
+        out_file.write(outs.data(), outs.size());
+        ofile_mut.unlock();
+        buff_size = 0;
+    }
+
+    // dump anything left in the buffer
+    if (buff_size > 0) {
+        std::string outs = ss.str();
+        ss.str("");
+        ofile_mut.lock();
+        out_file.write(outs.data(), outs.size());
+        ofile_mut.unlock();
+        buff_size = 0;
+    }
+
+    iomut.lock();
+    std::cout << "mapped " << num_reads << " reads" << std::endl;
+    iomut.unlock();
+
+    return 0;
+}
+int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
+					uint64_t num_threads, bool strict_threshold) {
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type index = (*f_ptr);
+
+    std::vector<uint32_t> all_col;
+
+    
+    pseudoalignment_algorithm algo = pseudoalignment_algorithm::THRESHOLD_UNION;
+    std::atomic<uint64_t> num_mapped_reads{0};
+    std::atomic<uint64_t> num_reads{0};
+    //auto query_filenames = std::vector<std::string>({query_file});
+    if (num_threads == 1) {
+        num_threads += 1;
+        essentials::logger(
+            "1 thread was specified, but an additional thread will be allocated for parsing");
+    }
+    //fastx_parser::FastxParser<fastx_parser::ReadSeq> rparser(query_filenames, num_threads, num_threads - 1);
+    //rparser.start();
+    std::vector<std::thread> workers;
+    std::mutex iomut;
+    std::mutex ofile_mut;
+
+    std::ofstream out_file;
+    //HARD CODED HERE
+    std::string output_filename = "/nfshomes/srinder/output.txt";
+    //HARD CODED 
+    out_file.open(output_filename, std::ios::out | std::ios::trunc);
+    if (!out_file) {
+        essentials::logger("could not open output file " + output_filename);
+        return 1;
+    }
+
+    chess_map(indexPtr, query_string, threshold, out_file, iomut, ofile_mut, all_col);
+
+    for (size_t i = 0; i < all_col.size(); i++) {
+        ret_arr[i] = all_col[i];
+    }
+
+    return 0;
+}
+
+
 
 // template <typename FulgorIndex>
 // void index_stats(void* indexPtr){
