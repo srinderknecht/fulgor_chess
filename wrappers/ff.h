@@ -30,10 +30,10 @@ extern "C" {
 	int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
 					uint64_t num_threads, bool strict_threshold);
 
-	int point_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
+	int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
 					uint64_t num_threads, bool strict_threshold);
 
-	int chess_map(void* indexPtr, const char* query_sequence, 
+	int chess_map(void* indexPtr, char* query_sequence, 
 					const double threshold, std::ofstream& out_file, 
 					std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& all_col);
 
