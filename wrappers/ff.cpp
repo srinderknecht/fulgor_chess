@@ -103,10 +103,7 @@ int point_query(void* indexPtr, int* ret_arr, char* query_string, double thresho
 					uint64_t num_threads, bool strict_threshold) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
-
     std::vector<uint32_t> all_col;
-
-    
     pseudoalignment_algorithm algo = pseudoalignment_algorithm::THRESHOLD_UNION;
     std::atomic<uint64_t> num_mapped_reads{0};
     std::atomic<uint64_t> num_reads{0};
@@ -116,8 +113,6 @@ int point_query(void* indexPtr, int* ret_arr, char* query_string, double thresho
         essentials::logger(
             "1 thread was specified, but an additional thread will be allocated for parsing");
     }
-    //fastx_parser::FastxParser<fastx_parser::ReadSeq> rparser(query_filenames, num_threads, num_threads - 1);
-    //rparser.start();
     std::vector<std::thread> workers;
     std::mutex iomut;
     std::mutex ofile_mut;
@@ -133,7 +128,6 @@ int point_query(void* indexPtr, int* ret_arr, char* query_string, double thresho
     }
 
     chess_map(indexPtr, query_string, threshold, out_file, iomut, ofile_mut, all_col);
-
     for (size_t i = 0; i < all_col.size(); i++) {
         ret_arr[i] = all_col[i];
     }
@@ -193,7 +187,7 @@ int chess_map(void* indexPtr, char& query_string,
 }
 */
 
-int chess_map(void* indexPtr, const char* query_sequence,
+int chess_map(void* indexPtr, char* query_sequence,
            const double threshold, std::ofstream& out_file, std::mutex& iomut,
            std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
     //Potentially replace indexPtr with FulgorIndex const& index
@@ -207,6 +201,7 @@ int chess_map(void* indexPtr, const char* query_sequence,
     uint64_t num_mapped_reads = 0;
 
     std::string query(query_sequence);
+    essentials::logger("query" + query);
     index.pseudoalign_threshold_union(query, colors, all_col, threshold);
     buff_size += 1;
     if (!colors.empty()) {
