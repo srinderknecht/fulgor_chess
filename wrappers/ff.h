@@ -28,10 +28,10 @@ extern "C" {
 				could also do it as an array of length [num subsets over the threshold], but would then need to store the integer of which subset it is 
 	*/
 	int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
-					uint64_t num_threads, bool strict_threshold);
+					uint64_t num_threads);
 
 	int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
-					uint64_t num_threads, bool strict_threshold);
+					uint64_t num_threads);
 
 	int chess_map(void* indexPtr, char* query_sequence, 
 					const double threshold, std::ofstream& out_file, 
