@@ -32,3 +32,6 @@ returned = lib.batch_query(index_ptr, x, b'/nfshomes/srober22/fasta_files/one_qu
 print("back in python")
 
 print(list(x))
+
+lib.unload_index.argtype = c_void_p
+lib.unload_index(index_ptr)

@@ -45,6 +45,11 @@ void* load_index(char* index_filename) {
     return index;
 }
 
+void unload_index(void* idx_ptr) {
+    fulgor::index_type* i_ptr = (fulgor::index_type*) idx_ptr;
+    delete i_ptr;
+}
+
 int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
                 uint64_t num_threads, bool strict_threshold) {
     index_type* f_ptr = (index_type*) indexPtr;
