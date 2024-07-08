@@ -77,7 +77,5 @@ extern "C" {
 }
 #endif
 
-// template <typename FulgorIndex>
-// void* loadIndex(char* index_filename);
 
 #endif /* __FF_H__ */
