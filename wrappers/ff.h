@@ -24,7 +24,7 @@ extern "C" {
 	/// @param query_string a char pointer that points to the sequence that will be queryed
 	/// @param num_threads the number of threads that are to be used when generating the fulgor array
 	/// @return array of bits [num subsets], arr[i] is 1 if subset i contains num k-mers over the given threshold, 0 otherwise
-	int point_query(void* indexPtr, int* ret_arr, char* query_string, uint64_t num_threads);
+	int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, uint64_t num_threads);
 	///FINISH BRIEF
 	/// @brief A helper function that is used in the point_query function, instead of using the fulgor provided mapping function. This function does not utilize the Fastx parser function since there is only a single sequence being queried. 
 	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory

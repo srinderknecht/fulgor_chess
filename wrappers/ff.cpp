@@ -89,10 +89,10 @@ int batch_query(void* indexPtr, int* ret_arr, char* query_file,
     return 0;
 }
 
-int point_query(void* indexPtr, int* ret_arr, char* query_string, uint64_t num_threads) {
+int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, uint64_t num_threads) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
-    double threshold = 0.0; //change when we figure it out
+    //double threshold = 0.0; //change when we figure it out
     std::vector<uint32_t> all_col;
     std::atomic<uint64_t> num_mapped_reads{0};
     std::atomic<uint64_t> num_reads{0};
