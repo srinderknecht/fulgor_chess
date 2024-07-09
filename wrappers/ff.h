@@ -28,7 +28,7 @@ extern "C" {
 				could also do it as an array of length [num subsets over the threshold], but would then need to store the integer of which subset it is 
 	*/
 	/// @brief Takes in a index_ptr, return array, query file and number of threds, then runs fulgor query on each sequence in the query file against the fulgor index
-	/// @param indexPtr a void pointer to the loaded index that is in memory
+	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
 	/// @param ret_arr an int pointer that points to an int array which will hold the outputed locations for each sequence
 	/// @param query_file a char pointer that points to the sequence file that Fastx uses to load all the sequence into a parsar
 	/// @param threshold delete
@@ -37,15 +37,24 @@ extern "C" {
 	int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
 					uint64_t num_threads);
 	/// @brief Takes in a index_ptr, return array, query sequence and number of threds, then runs fulgor query on the singular sequence that is submitted
-	/// @param indexPtr a void pointer to the loaded index that is in memory
+	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
 	/// @param ret_arr an int pointer that points to an int array which will hold the outputed locations for the query sequence
-	/// @param query_file a char pointer that points to the sequence that will be queryed
+	/// @param query_string a char pointer that points to the sequence that will be queryed
 	/// @param threshold delete
 	/// @param num_threads the number of threads that are to be used when generating the fulgor array
 	/// @return array of bits [num subsets], arr[i] is 1 if subset i contains num k-mers over the given threshold, 0 otherwise
 	int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
 					uint64_t num_threads);
-
+	///FINISH BRIEF
+	/// @brief A helper function that is used in the point_query function, instead of using the fulgor provided mapping function. This function does not utilize the Fastx parser function since there is only a single sequence being queried. 
+	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
+	/// @param query_sequence a char pointer that points to the sequence that will be queryed
+	/// @param threshold delete
+	/// @param out_file the output file for the dump to be written too.
+	/// @param iomut Look up
+	/// @param ofile_mut Look up
+	/// @param all_col Look up
+	/// @return 
 	int chess_map(void* indexPtr, char* query_sequence, 
 					const double threshold, std::ofstream& out_file, 
 					std::mutex& iomut, std::mutex& ofile_mut, std::vector<uint32_t>& all_col);
@@ -59,6 +68,8 @@ extern "C" {
 			Writes to std::out
 				fulgor stats
 	*/
+	/// @brief a helper function that calls the fulgor function, print_stats, so it can be utilized in Python
+	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
 	void index_stats(void* indexPtr);
 
 	/*
@@ -80,10 +91,13 @@ extern "C" {
 	/*
 	If we want the index to be loaded the whole time, would need to implement a load function, return the index, and then pass it in to each of the functions above. 
 	*/
-
+	/// @brief 
+	/// @param index_filename a character pointer to 
+	/// @return returns a pointer to memory where the fulgor index is 
 	void* load_index(char* index_filename);
-
-	void unload_index(void* idx_ptr);
+	/// @brief
+	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
+	void unload_index(void* indexPtr);
 	
 
 #ifdef __cplusplus

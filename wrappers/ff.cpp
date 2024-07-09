@@ -27,8 +27,8 @@ void* load_index(char* index_filename) {
     return index;
 }
 
-void unload_index(void* idx_ptr) {
-    fulgor::index_type* i_ptr = (fulgor::index_type*) idx_ptr;
+void unload_index(void* indexPtr) {
+    fulgor::index_type* i_ptr = (fulgor::index_type*) indexPtr;
     delete i_ptr;
 }
 
