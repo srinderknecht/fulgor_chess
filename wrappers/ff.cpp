@@ -38,11 +38,11 @@ void index_stats(void* indexPtr) {
     f.print_stats();
 }
 
-int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold, 
+int batch_query(void* indexPtr, int* ret_arr, char* query_file, 
                 uint64_t num_threads) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
-
+    double threshold = 0.0; //For now.
     std::vector<uint32_t> all_col;
 
     
@@ -89,10 +89,10 @@ int batch_query(void* indexPtr, int* ret_arr, char* query_file, double threshold
     return 0;
 }
 
-int point_query(void* indexPtr, int* ret_arr, char* query_string, double threshold, 
-					uint64_t num_threads) {
+int point_query(void* indexPtr, int* ret_arr, char* query_string, uint64_t num_threads) {
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
+    double threshold = 0.0; //change when we figure it out
     std::vector<uint32_t> all_col;
     std::atomic<uint64_t> num_mapped_reads{0};
     std::atomic<uint64_t> num_reads{0};
@@ -127,6 +127,7 @@ int chess_map(void* indexPtr, char* query_sequence,
            const double threshold, std::ofstream& out_file, std::mutex& iomut,
            std::mutex& ofile_mut, std::vector<uint32_t>& all_col) {
     //Potentially replace indexPtr with FulgorIndex const& index
+    //is threshold able to stay in the function call, since its being called from inside point query where it is already declared?
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
     std::vector<uint32_t> colors;
