@@ -4,6 +4,8 @@
 #include "include/index_types.hpp"
 #include "src/index.cpp"
 #include "external/sshash/external/pthash/external/cmd_line_parser/include/parser.hpp"
+#include "external/sshash/include/dictionary.hpp"
+#include "external/sshash/include/query/streaming_query_canonical_parsing.hpp"
 
 #include "tools/util.cpp"
 #include "tools/build.cpp"
@@ -20,6 +22,7 @@
 
 using namespace std;
 using namespace fulgor;
+using namespace sshash;
 
 void* load_index(char* index_filename) {
     index_type* index = new index_type();  // Use 'new' instead of malloc
@@ -178,4 +181,24 @@ int chess_map(void* indexPtr, char* query_sequence,
     iomut.unlock();
 
     return 0;
+}
+typedef fulgor::scored<uint64_t> scored_id;
+int streamWMulti(void* indexPtr, const char* seq, int* ret_arr){
+    index_type* f_ptr = (index_type*) indexPtr;
+    index_type index = (*f_ptr);
+    string sequence = seq;
+    vector<scored_id> unitigs_ids;
+    sshash::dictionary miku = index.get_k2u();
+    uint64_t num_pos_kmer = stream_through_with_multiplicities(miku, sequence, unitigs_ids);
+    int size = 0;
+    for (const auto& unitig : unitigs_ids) {
+        cout << unitig.item << endl;
+        size++;
+    }
+    for (int i = 0; i < size; i++){
+        int temp = unitigs_ids[i].item;
+        ret_arr[i] = temp;
+    }
+    return 0;
+    
 }
