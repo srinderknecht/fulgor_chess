@@ -183,7 +183,7 @@ int chess_map(void* indexPtr, char* query_sequence,
     return 0;
 }
 typedef fulgor::scored<uint64_t> scored_id;
-int streamWMulti(void* indexPtr, const char* seq, int* ret_arr){
+int streamWMulti(void* indexPtr, const char* seq, int* ret_arr, int* score_arr){
     index_type* f_ptr = (index_type*) indexPtr;
     index_type index = (*f_ptr);
     string sequence = seq;
@@ -192,12 +192,11 @@ int streamWMulti(void* indexPtr, const char* seq, int* ret_arr){
     uint64_t num_pos_kmer = stream_through_with_multiplicities(miku, sequence, unitigs_ids);
     int size = 0;
     for (const auto& unitig : unitigs_ids) {
-        cout << unitig.item << endl;
         size++;
     }
-    for (int i = 0; i < size; i++){
-        int temp = unitigs_ids[i].item;
-        ret_arr[i] = temp;
+    for (int i = 0; i < size; i++){        
+        ret_arr[i] = unitigs_ids[i].item;
+        score_arr[i] = unitigs_ids[i].score;
     }
     return 0;
     
