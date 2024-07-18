@@ -54,11 +54,11 @@ extern "C" {
 	void index_stats(void* indexPtr);
 	
 
-	/// @brief Reads in a file path to where the fulgor index is located in disk, then loads it into memory as a pointer, reducing the time it takes to load from disk.
+	/// @brief Reads in a file path to the fuglor index, then loads it into memory as a pointer.
 	///
 	/// @param index_filename a character pointer to the filename of the fulgor index. 
 	///
-	/// @return returns a pointer to memory where the fulgor index is 
+	/// @return returns pointer to the fulgor index
 	void* load_index(char* index_filename);
 
 
