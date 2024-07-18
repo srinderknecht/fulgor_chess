@@ -66,7 +66,7 @@ extern "C" {
 	///
 	/// @param indexPtr a void pointer to the loaded fulgor index which is in memory
 	void unload_index(void* indexPtr);
-	int streamWMulti(void* indexPtr, const char* seq, int* ret_arr);
+	int streamWMulti(void* indexPtr, const char* seq, int* ret_arr, int* score_arr);
 
 #ifdef __cplusplus
 }
