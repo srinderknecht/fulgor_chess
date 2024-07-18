@@ -182,6 +182,7 @@ int chess_map(void* indexPtr, char* query_sequence,
 
     return 0;
 }
+
 typedef fulgor::scored<uint64_t> scored_id;
 int streamWMulti(void* indexPtr, const char* seq, int* ret_arr){
     index_type* f_ptr = (index_type*) indexPtr;
